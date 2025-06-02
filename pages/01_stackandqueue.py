@@ -11,6 +11,7 @@ st.header("1️⃣ 스택 (Stack)")
 st.markdown("""
 스택은 **LIFO (Last In, First Out)** 구조입니다.  
 즉, 가장 마지막에 들어간 데이터가 가장 먼저 나옵니다.  
+참 쉽죠?
 대표적인 연산은 `push`(삽입), `pop`(삭제)입니다.
 """)
 
