@@ -38,8 +38,8 @@ else:
 # 형성평가 버튼
 st.sidebar.markdown("""
 <div style='text-align: center; margin: 20px 0;'>
-    <a href='https://forms.gle/2hc8i1iKb7LLwuVK7' target='_blank' style='padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;'>
-        형성평가 시작
+    <a href='https://hyunet.notion.site/with-1ff6da7e415a802b91c6fb908f43c1c1?source=copy_link' target='_blank' style='padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;'>
+        바이브 코딩
     </a>
 </div>
 """, unsafe_allow_html=True)
