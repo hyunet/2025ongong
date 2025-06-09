@@ -1,5 +1,5 @@
 import streamlit as st
-import folium
+import folium 
 from streamlit_folium import st_folium
 
 st.title("🗺️ 나만의 위치 북마크 지도")
