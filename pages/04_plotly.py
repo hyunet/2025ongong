@@ -13,7 +13,7 @@ except FileNotFoundError:
     st.stop()
 
 # 지역 선택
-region_list = df['행정구역'].unique()
+region_list = df['행정구역'].unique() 
 selected_region = st.selectbox("🔍 행정구역을 선택하세요", region_list)
 
 # 연령 데이터 추출
