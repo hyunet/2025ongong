@@ -6,7 +6,7 @@ st.set_page_config(page_title="인구 피라미드", layout="wide")
 st.title("👥 연령별 인구 피라미드 (Plotly)")
 
 # CSV 파일 불러오기
-df = pd.read_csv("202505_202505_연령별인구현황_월간.csv", encoding='cp949')
+df = pd.read_csv("../202505_202505_연령별인구현황_월간.csv", encoding='cp949')
 '''
 uploaded_file = st.file_uploader("CSV 파일을 업로드하세요", type=["csv"])
 if uploaded_file is not None:
