@@ -1,5 +1,5 @@
 streamlit
-plotly
+plotly 
 streamlit-folium
 koreanize_matplotlib
 streamlit==1.32.0
