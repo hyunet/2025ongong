@@ -1,73 +1,38 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from pathlib import Path
 
-st.set_page_config(page_title="인구 피라미드 시각화", layout="wide")
-st.title("👥 지역별 연령대 인구 피라미드")
+st.title("📈 인구 트렌드 및 성비 분석")
 
-# ✅ CSV 파일 경로 (루트 기준)
-csv_path = Path.cwd() / "people.csv"
-
-# ✅ 데이터 불러오기 (cp949 우선, 실패 시 utf-8-sig)
-try:
-    df = pd.read_csv(csv_path, encoding='cp949')
-except UnicodeDecodeError:
-    df = pd.read_csv(csv_path, encoding='utf-8-sig')
-
-# ✅ 남녀 연령 컬럼 추출
+df = pd.read_csv("people.csv", encoding='cp949')
 male_cols = [col for col in df.columns if '남_' in col and '세' in col]
 female_cols = [col for col in df.columns if '여_' in col and '세' in col]
 
-# 연령 숫자 정리 (0세 ~ 100+세)
-def extract_age(col):
-    return col.split('_')[-1].replace('세', '').replace('이상', '100+')
-ages = [extract_age(c) for c in male_cols]
-ages_num = [int(a.replace('+', '')) if '+' not in a else 100 for a in ages]
+# 지표 계산
+insights = []
+for _, row in df.iterrows():
+    region = row['행정구역']
+    male_total = pd.to_numeric(row[male_cols].str.replace(',', ''), errors='coerce').sum()
+    female_total = pd.to_numeric(row[female_cols].str.replace(',', ''), errors='coerce').sum()
+    total = male_total + female_total
+    elderly_male = pd.to_numeric(row[[c for c in male_cols if '70' in c or '80' in c or '90' in c or '100' in c]].str.replace(',', ''), errors='coerce').sum()
+    elderly_female = pd.to_numeric(row[[c for c in female_cols if '70' in c or '80' in c or '90' in c or '100' in c]].str.replace(',', ''), errors='coerce').sum()
+    elderly_ratio = round(((elderly_male + elderly_female) / total) * 100, 2) if total else 0
+    sex_ratio = round((male_total / female_total) * 100, 2) if female_total else 0
+    insights.append({
+        "지역": region,
+        "총인구": total,
+        "남성": male_total,
+        "여성": female_total,
+        "성비 (%)": sex_ratio,
+        "고령 인구 비율 (%)": elderly_ratio
+    })
 
-# ✅ 지역 선택
-region = st.selectbox("🏙️ 지역을 선택하세요", df['행정구역'].unique())
+insight_df = pd.DataFrame(insights)
 
-# ✅ 연령 슬라이더
-min_age, max_age = st.slider("🎚️ 연령 범위 선택", 0, 100, (0, 100))
-
-# ✅ 선택한 지역 데이터 정리
-row = df[df['행정구역'] == region].iloc[0]
-
-male = pd.to_numeric(row[male_cols].str.replace(",", ""), errors='coerce').fillna(0).astype(int)
-female = pd.to_numeric(row[female_cols].str.replace(",", ""), errors='coerce').fillna(0).astype(int)
-
-# ✅ 연령 필터링
-filtered = [(a, m, f) for a, m, f in zip(ages_num, male, female) if min_age <= a <= max_age]
-ages_f, male_f, female_f = zip(*filtered)
-age_labels = [f"{a}세" if a != 100 else "100세 이상" for a in ages_f]
-
-# ✅ 피라미드용 데이터프레임
-df_pyramid = pd.DataFrame({
-    "연령": age_labels,
-    "남성": [-m for m in male_f],   # 좌측
-    "여성": female_f                # 우측
-})
-
-# ✅ Long-form 변환
-df_long = df_pyramid.melt(id_vars="연령", var_name="성별", value_name="인구수")
-
-# ✅ Plotly 시각화
-fig = px.bar(
-    df_long,
-    x="인구수",
-    y="연령",
-    color="성별",
-    orientation="h",
-    title=f"📊 {region} 연령별 인구 피라미드",
-    height=800,
-    color_discrete_map={"남성": "royalblue", "여성": "salmon"}
-)
-fig.update_layout(
-    yaxis=dict(categoryorder="category ascending"),
-    xaxis_title="인구 수",
-    yaxis_title="연령대",
-    bargap=0.05
-)
-
+# 시각화
+col_option = st.selectbox("📌 분석 항목 선택", ['성비 (%)', '고령 인구 비율 (%)', '총인구'])
+fig = px.bar(insight_df.sort_values(col_option, ascending=False),
+             x="지역", y=col_option,
+             title=f"{col_option} 기준 정렬", color=col_option)
 st.plotly_chart(fig, use_container_width=True)
