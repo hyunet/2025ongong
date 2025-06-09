@@ -4,7 +4,7 @@ import plotly.express as px
 import re
 
 # 파일 경로 설정 (예: 상위 폴더에 data 폴더가 있을 경우)
-gender_file = '../data/people_gender.csv'
+gender_file = '../people_gender.csv'
 
 # CSV 읽기 (CP949 인코딩)
 df_gender = pd.read_csv(gender_file, encoding='cp949')
